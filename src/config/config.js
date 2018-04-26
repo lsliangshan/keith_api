@@ -34,7 +34,7 @@
  * Created by liangshan on 2017/11/14.
  */
 module.exports = {
-  app_port: 3000,
+  app_port: 3001,
   default_group: 'Home',
   groups: ['Home']
 }
