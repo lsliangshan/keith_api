@@ -36,5 +36,14 @@
 module.exports = {
   app_port: 3001,
   default_group: 'Home',
-  groups: ['Home']
+  groups: ['Home'],
+  default_static: ['Static', '.well-known'], // 静态资源目录
+  socket: {
+    ban: false, // 是否开启websocket
+    type: 'wss',
+    port: '3011',
+    userKey: 'phonenum', // 用户名
+    namespace: '/cmd',
+    events: ['enkel-message']
+  }
 }
