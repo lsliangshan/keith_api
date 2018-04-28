@@ -26,5 +26,11 @@
     "api"
   ],
   "author": "cheenoalive@gmail.com",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "big-integer": "^1.6.28",
+    "crypto": "^1.0.1",
+    "jsonwebtoken": "^8.2.1",
+    "querystring": "^0.2.0"
+  }
 }
