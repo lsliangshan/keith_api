@@ -59,4 +59,8 @@ typings/
 
 .idea/
 
+.idea/workspace.xml
+
 app/
+
+node_modules_bak/
