@@ -195,4 +195,32 @@ module.exports = class extends enkel.controller.base {
       list: robotList || []
     }})
   }
+
+    /**
+     * 前端页面连接robot
+     * @returns {Promise<JSON | Promise<any>>}
+     */
+  async connectAction () {
+      if (!this.isPost()) {
+          return this.json({status: 405, message: '请求方法不正确', data: {}});
+      }
+      let params = await this.post();
+      if (!params.uuid || params.uuid === '') {
+        return this.json({status: 401, message: 'robot设备id不能为空', data: {}});
+      }
+      if (!params.password || params.password === '') {
+        return this.json({status: 401, message: '密码不能为空', data: {}});
+      }
+      let robotCount = await this.RobotModel.count({
+          where: {
+            uuid: params.uuid,
+              password: params.password
+          }
+      })
+      if (robotCount > 0) {
+        return this.json({status: 200, message: '成功', data: {username: params.username}});
+      } else {
+        return this.json({status: 401, message: '连接失败，密码不正确', data: {username: params.username}});
+      }
+  }
 }
