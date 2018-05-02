@@ -17,6 +17,10 @@ module.exports = {
       type: Sequelize.STRING,
         defaultValue: ''
     },
+    password: {
+      type: Sequelize.STRING,
+      defaultValue: ''
+    },
     headIcon: {
       type: Sequelize.STRING,
         defaultValue: ''
