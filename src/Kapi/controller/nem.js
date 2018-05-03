@@ -73,6 +73,7 @@ module.exports = class extends enkel.controller.base {
 
     // this.axios = enkel.axios;
     this.nemRequest = enkel.axios;
+    this.nemRequest.defaults.timeout = 5000
     this.nemRequest.defaults.baseURL = BASE_URL;
     this.nemRequest.defaults.headers = Object.assign({}, publicHeaders);
 
@@ -233,7 +234,7 @@ module.exports = class extends enkel.controller.base {
     }).catch(err => {
       console.log(err.message)
     });
-    return this.json({status: 200, data: musicData.data});
+    return this.json({status: 200, data: musicData ? musicData.data : {}});
   }
 
   /**
@@ -256,7 +257,7 @@ module.exports = class extends enkel.controller.base {
     }).catch(err => {
       console.log(err.message)
     });
-    return this.json({status: 200, data: urlData.data});
+    return this.json({status: 200, data: urlData ? urlData.data : {}});
   }
 
   /**
