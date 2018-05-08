@@ -36,6 +36,7 @@
 const jwt = require('jsonwebtoken');
 const secret = 'com.dei2';
 const tokenExpiresIn = '7d';
+let SSE_CLIENTS = {}
 module.exports = class extends enkel.controller.base {
   init (http) {
     super.init(http);
@@ -222,5 +223,49 @@ module.exports = class extends enkel.controller.base {
       } else {
         return this.json({status: 401, message: '连接失败，密码不正确', data: {username: params.username}});
       }
+  }
+
+  async sseAction () {
+    function everyClient(fn) {
+      Object.keys(SSE_CLIENTS).forEach(function(id) {
+        fn(SSE_CLIENTS[id].client);
+      });
+    }
+    if (this.get('message')) {
+      // 试图通过get方式 发送事件
+      return this.json({status: 1001, message: '请求方式不正确'})
+    }
+    let params = await this.post();
+    // 优先从get请求中获取id
+    let clientId = this.get('id') || params.id;
+    if (params.message) {
+        everyClient(function(client) {
+          client.write('event: ' + params.type + '\n');
+          client.write("data: " + params.message + "\n\n");
+        });
+      return this.json({status: 200})
+    } else {
+      if (SSE_CLIENTS[clientId]) {
+        clearInterval(SSE_CLIENTS[clientId].interval)
+        delete SSE_CLIENTS[clientId]
+      }
+      SSE_CLIENTS[clientId] = {}
+      this.response.setHeader('Content-Type', 'text/event-stream');
+      this.response.setHeader('Cache-Control', 'no-cache');
+      this.response.setHeader('Connection', 'keep-alive');
+      this.response.write('retry: 5000\n');
+      let messageType = this.get('mt')
+      if (messageType) {
+        this.response.write('event: ' + messageType + '\n');
+      }
+      SSE_CLIENTS[clientId].client = this.response
+      SSE_CLIENTS[clientId].client.write('data: connected\n\n');
+      SSE_CLIENTS[clientId].interval = setInterval(function heartbeatTick() {
+        everyClient(function(client) {
+          client.write('event: heartbeats\n');
+          client.write("data: \uD83D\uDC93\n\n");
+        });
+      }, 5000).unref();
+    }
   }
 }
