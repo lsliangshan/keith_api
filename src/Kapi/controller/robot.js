@@ -231,17 +231,17 @@ module.exports = class extends enkel.controller.base {
         fn(SSE_CLIENTS[id].client);
       });
     }
-    if (this.get('message')) {
+    if (this.get('data')) {
       // 试图通过get方式 发送事件
       return this.json({status: 1001, message: '请求方式不正确'})
     }
     let params = await this.post();
     // 优先从get请求中获取id
     let clientId = this.get('id') || params.id;
-    if (params.message) {
+    if (params.data) {
         everyClient(function(client) {
           client.write('event: ' + params.type + '\n');
-          client.write("data: " + params.message + "\n\n");
+          client.write("data: " + params.data + "\n\n");
         });
       return this.json({status: 200})
     } else {
@@ -259,6 +259,7 @@ module.exports = class extends enkel.controller.base {
         this.response.write('event: ' + messageType + '\n');
       }
       SSE_CLIENTS[clientId].client = this.response
+      SSE_CLIENTS[clientId].client.write('event: connect\n\n');
       SSE_CLIENTS[clientId].client.write('data: connected\n\n');
       SSE_CLIENTS[clientId].interval = setInterval(function heartbeatTick() {
         everyClient(function(client) {
