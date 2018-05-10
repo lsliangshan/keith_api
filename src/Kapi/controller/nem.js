@@ -59,6 +59,7 @@ const NEM_APIS = {
   search: '/weapi/cloudsearch/get/web', // 搜索歌曲
   detail: '/weapi/v3/song/detail', // 单曲详情
   url: '/weapi/song/enhance/player/url', // 歌曲的真实地址
+  lyric: '/api/song/lyric', // 获取歌词
 };
 const BASE_URL = 'http://music.163.com';
 
@@ -285,5 +286,20 @@ module.exports = class extends enkel.controller.base {
       console.log(err.message)
     });
     return this.json({status: 200, data: detailData.data});
+  }
+
+  /**
+   * 通过歌曲id获取歌词
+   * @returns {Promise.<*|{line, column}|number>}
+   */
+  async lyricAction () {
+    let id = this.get('id');
+    let lyricData = await this.nemRequest({
+      url: NEM_APIS.lyric + '?os=osx&id=' + id + '&&lv=-1&kv=-1&tv=-1',
+      method: 'get'
+    }).catch(err => {
+      console.log(err.message)
+    })
+    return this.json({status: 200, data: lyricData.data});
   }
 }
