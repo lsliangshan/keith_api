@@ -226,6 +226,16 @@ module.exports = class extends enkel.controller.base {
   }
 
   async sseAction () {
+    this.response.setHeader('Access-Control-Allow-Origin', '*');
+    this.response.setHeader('Access-Control-Allow-Headers', 'content-type');
+    this.response.setHeader('Access-Control-Allow-Methods', '*');
+    function sleep (ts) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(true)
+        }, ts)
+      })
+    }
     function everyClient(fn) {
       Object.keys(SSE_CLIENTS).forEach(function(id) {
         fn(SSE_CLIENTS[id].client);
@@ -239,10 +249,11 @@ module.exports = class extends enkel.controller.base {
     // 优先从get请求中获取id
     let clientId = this.get('id') || params.id;
     if (params.data) {
-        everyClient(function(client) {
-          client.write('event: ' + params.type + '\n');
-          client.write("data: " + params.data + "\n\n");
-        });
+      everyClient(function(client) {
+        client.write('event: ' + params.type + '\n');
+        client.write("data: " + params.data + "\n\n");
+      });
+      await sleep(800)
       return this.json({status: 200})
     } else {
       if (SSE_CLIENTS[clientId]) {
@@ -266,7 +277,7 @@ module.exports = class extends enkel.controller.base {
           client.write('event: heartbeats\n');
           client.write("data: \uD83D\uDC93\n\n");
         });
-      }, 5000).unref();
+      }, 5000)
     }
   }
 }
